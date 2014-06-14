@@ -47,7 +47,10 @@ def upgrade():
 
     try:
         op.create_index(
-            'bmarks_username_fkey', 'bmarks', ['username'], 'unique')
+            'bmarks_username_fkey',
+            'bmarks',
+            ['username', 'hash_id'],
+            'unique')
         op.create_foreign_key(
             'bmarks_username_fkey', 'bmarks',
             'users', ['username'], ['username'])
