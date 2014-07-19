@@ -30,9 +30,20 @@ def twitter_connect(request):
     denied = request.params.get('denied', None)
     if denied:
         LOG.error('Twitter connection denied')
-        return {'result': 'Connection Denied! Try connecting again.',
-                'retry_link': True}
+        return {
+            'result': 'Connection Denied! Try connecting again.',
+            'retry_link': True
+        }
     elif oauth_token and oauth_verifier:
+        # First make sure these credentials do not exist for another user.
+        found = TwitterConnection.query.filter(
+            TwitterConnection.access_secret == unicode(oauth_token),
+            TwitterConnection.access_secret == unicode(oauth_verifier)).first()
+        if found:
+            return {
+                'result': 'Invalid credentials, another user has claimed them'
+            }
+
         # If url contains OAUTH credentials, after making sure that same
         # credentials are not provide by any other user they are saved to
         # twitterconnection table
